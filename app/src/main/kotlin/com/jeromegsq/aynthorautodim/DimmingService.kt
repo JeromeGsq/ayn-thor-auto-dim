@@ -124,7 +124,7 @@ class DimmingService : AccessibilityService() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(contentText)
-            .setSmallIcon(R.mipmap.ic_launcher) // Using app icon as notification icon
+            .setSmallIcon(R.drawable.ic_notification)
             .addAction(0, actionText, pendingToggleIntent)
             .setOngoing(true)
             .build()
