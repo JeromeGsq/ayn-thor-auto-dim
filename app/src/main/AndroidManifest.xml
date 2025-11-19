@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Although Accessibility Service doesn't strictly need foreground service permission, it's good practice if we do background work, but not needed for basic accessibility -->
 
     <application
@@ -40,4 +41,3 @@
     </application>
 
 </manifest>
-

@@ -1,6 +1,10 @@
 package com.jeromegsq.aynthorautodim
 
 import android.accessibilityservice.AccessibilityService
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -16,6 +20,7 @@ import android.view.Display
 import android.view.View
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.app.NotificationCompat
 
 class DimmingService : AccessibilityService() {
 
@@ -27,15 +32,26 @@ class DimmingService : AccessibilityService() {
     private val dimRunnable = Runnable { showBlackScreen() }
     
     private var inactivityDelayMs = 3000L
+    private var isServicePaused = false
 
     private val configReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == ACTION_UPDATE_CONFIG) {
                 Log.d(TAG, "Configuration update received")
                 loadPreferences()
-                // If the overlay is currently shown, we might want to update it or reset.
-                // Simplest approach: reset timer. This will remove overlay (wake up) and restart timer with new settings.
-                resetTimer()
+                if (!isServicePaused) {
+                    resetTimer()
+                }
+            } else if (intent?.action == ACTION_TOGGLE_SERVICE) {
+                isServicePaused = !isServicePaused
+                Log.d(TAG, "Service toggled: paused=$isServicePaused")
+                updateNotification()
+                if (isServicePaused) {
+                    removeOverlay()
+                    handler.removeCallbacks(dimRunnable)
+                } else {
+                    resetTimer()
+                }
             }
         }
     }
@@ -45,8 +61,14 @@ class DimmingService : AccessibilityService() {
         Log.d(TAG, "Service Connected")
         
         loadPreferences()
+        createNotificationChannel()
+        startForeground(NOTIFICATION_ID, createNotification())
 
-        val filter = IntentFilter(ACTION_UPDATE_CONFIG)
+        val filter = IntentFilter().apply {
+            addAction(ACTION_UPDATE_CONFIG)
+            addAction(ACTION_TOGGLE_SERVICE)
+        }
+        
         if (Build.VERSION.SDK_INT >= 34) {
             registerReceiver(configReceiver, filter, Context.RECEIVER_EXPORTED)
         } else {
@@ -73,7 +95,44 @@ class DimmingService : AccessibilityService() {
         }, handler)
 
         checkForSecondaryDisplay(displayManager)
-        resetTimer()
+        if (!isServicePaused) {
+            resetTimer()
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notification_channel_name),
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun createNotification(): Notification {
+        val toggleIntent = Intent(ACTION_TOGGLE_SERVICE).setPackage(packageName)
+        val pendingToggleIntent = PendingIntent.getBroadcast(
+            this, 0, toggleIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val actionText = if (isServicePaused) getString(R.string.action_resume) else getString(R.string.action_pause)
+        val contentText = if (isServicePaused) getString(R.string.notification_text_paused) else getString(R.string.notification_text_running)
+
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(getString(R.string.notification_title))
+            .setContentText(contentText)
+            .setSmallIcon(R.mipmap.ic_launcher) // Using app icon as notification icon
+            .addAction(0, actionText, pendingToggleIntent)
+            .setOngoing(true)
+            .build()
+    }
+
+    private fun updateNotification() {
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.notify(NOTIFICATION_ID, createNotification())
     }
 
     private fun checkForSecondaryDisplay(displayManager: DisplayManager) {
@@ -89,7 +148,9 @@ class DimmingService : AccessibilityService() {
                 val displayContext = createDisplayContext(display)
                 targetWindowManager = displayContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
                 
-                resetTimer()
+                if (!isServicePaused) {
+                    resetTimer()
+                }
                 return
             }
         }
@@ -97,6 +158,7 @@ class DimmingService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
         if (event == null) return
+        if (isServicePaused) return
 
         // Ignore events from our own app to prevent feedback loop (Show -> Event -> Reset -> Hide -> Flashing)
         if (event.packageName != null && event.packageName == packageName) {
@@ -130,6 +192,7 @@ class DimmingService : AccessibilityService() {
     }
 
     private fun showBlackScreen() {
+        if (isServicePaused) return
         if (overlayView != null) return 
         if (targetWindowManager == null) return 
 
@@ -184,6 +247,8 @@ class DimmingService : AccessibilityService() {
     }
 
     private fun resetTimer() {
+        if (isServicePaused) return
+
         // If overlay is showing, hide it
         if (overlayView != null) {
             removeOverlay()
@@ -205,6 +270,8 @@ class DimmingService : AccessibilityService() {
     companion object {
         private const val TAG = "DimmingService"
         const val ACTION_UPDATE_CONFIG = "com.jeromegsq.aynthorautodim.UPDATE_CONFIG"
+        const val ACTION_TOGGLE_SERVICE = "com.jeromegsq.aynthorautodim.TOGGLE_SERVICE"
+        private const val CHANNEL_ID = "dimming_service_channel"
+        private const val NOTIFICATION_ID = 1
     }
 }
-

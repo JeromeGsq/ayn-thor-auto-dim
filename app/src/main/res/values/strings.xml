@@ -13,4 +13,10 @@
     <string name="opacity_label">Opacity: %d%%</string>
     <string name="true_black_label">True Black Mode</string>
     <string name="true_black_desc">Allows 100% opacity but requires a tap to wake up (blocks the first touch).</string>
+    <string name="notification_channel_name">Service Notification</string>
+    <string name="notification_title">Auto Dim Service</string>
+    <string name="notification_text_running">Service is active</string>
+    <string name="notification_text_paused">Service is paused</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
 </resources>
