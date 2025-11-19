@@ -94,6 +94,12 @@ class MainActivity : AppCompatActivity() {
                 .putInt("overlay_opacity", opacity)
                 .putBoolean("true_black_mode", trueBlack)
                 .apply()
+            
+            // Notify service to update config
+            val intent = Intent(DimmingService.ACTION_UPDATE_CONFIG)
+            intent.setPackage(packageName)
+            sendBroadcast(intent)
+            
             Toast.makeText(this, R.string.saved_toast, Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Invalid duration", Toast.LENGTH_SHORT).show()

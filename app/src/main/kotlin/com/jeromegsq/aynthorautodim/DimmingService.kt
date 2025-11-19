@@ -1,7 +1,10 @@
 package com.jeromegsq.aynthorautodim
 
 import android.accessibilityservice.AccessibilityService
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.hardware.display.DisplayManager
@@ -27,11 +30,30 @@ class DimmingService : AccessibilityService() {
     private var overlayOpacity = 1f
     private var trueBlackMode = false
 
+    private val configReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == ACTION_UPDATE_CONFIG) {
+                Log.d(TAG, "Configuration update received")
+                loadPreferences()
+                // If the overlay is currently shown, we might want to update it or reset.
+                // Simplest approach: reset timer. This will remove overlay (wake up) and restart timer with new settings.
+                resetTimer()
+            }
+        }
+    }
+
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Service Connected")
         
         loadPreferences()
+
+        val filter = IntentFilter(ACTION_UPDATE_CONFIG)
+        if (Build.VERSION.SDK_INT >= 34) {
+            registerReceiver(configReceiver, filter, Context.RECEIVER_EXPORTED)
+        } else {
+            registerReceiver(configReceiver, filter)
+        }
         
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         displayManager.registerDisplayListener(object : DisplayManager.DisplayListener {
@@ -101,6 +123,11 @@ class DimmingService : AccessibilityService() {
     
     override fun onDestroy() {
         super.onDestroy()
+        try {
+            unregisterReceiver(configReceiver)
+        } catch (e: Exception) {
+            // Receiver might not be registered or already unregistered
+        }
         removeOverlay()
     }
 
@@ -186,6 +213,7 @@ class DimmingService : AccessibilityService() {
 
     companion object {
         private const val TAG = "DimmingService"
+        const val ACTION_UPDATE_CONFIG = "com.jeromegsq.aynthorautodim.UPDATE_CONFIG"
     }
 }
 
