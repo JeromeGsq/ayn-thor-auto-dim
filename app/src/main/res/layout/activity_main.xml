@@ -1,114 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/statusText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/service_status_stopped"
-        android:textSize="18sp"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- Duration Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginBottom="16dp">
+        android:padding="16dp">
 
         <TextView
+            android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/delay_label"
-            android:textSize="16sp"
-            android:layout_marginEnd="8dp"/>
+            android:text="@string/service_status_stopped"
+            android:textSize="18sp"
+            android:layout_marginBottom="24dp"/>
 
-        <EditText
-            android:id="@+id/delayInput"
-            android:layout_width="80dp"
+        <!-- Duration Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:text="3"
-            android:textAlignment="center"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/delay_label"
+                android:textSize="16sp"
+                android:layout_marginEnd="8dp"/>
+
+            <EditText
+                android:id="@+id/delayInput"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="3"
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:layout_marginStart="8dp"/>
+
+        </LinearLayout>
+
+        <!-- Opacity Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:paddingHorizontal="32dp">
+
+            <TextView
+                android:id="@+id/opacityLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Opacity: 100%"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"/>
+
+            <SeekBar
+                android:id="@+id/opacitySeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="100"/>
+
+        </LinearLayout>
+
+        <!-- True Black Mode Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:paddingHorizontal="32dp">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/trueBlackSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/true_black_label"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/true_black_desc"
+                android:textSize="12sp"
+                android:alpha="0.7"
+                android:layout_marginTop="4dp"/>
+
+        </LinearLayout>
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/permissionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/save"
-            android:layout_marginStart="8dp"/>
+            android:text="@string/grant_permission"
+            android:layout_marginBottom="16dp"/>
 
-    </LinearLayout>
-
-    <!-- Opacity Section -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginBottom="16dp"
-        android:paddingHorizontal="32dp">
-
-        <TextView
-            android:id="@+id/opacityLabel"
+        <Button
+            android:id="@+id/serviceButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Opacity: 100%"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp"/>
-
-        <SeekBar
-            android:id="@+id/opacitySeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            android:progress="100"/>
+            android:text="@string/enable_service"/>
 
     </LinearLayout>
-
-    <!-- True Black Mode Section -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_marginBottom="24dp"
-        android:paddingHorizontal="32dp">
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/trueBlackSwitch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/true_black_label"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/true_black_desc"
-            android:textSize="12sp"
-            android:alpha="0.7"
-            android:layout_marginTop="4dp"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/permissionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/grant_permission"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/serviceButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/enable_service"/>
-
-</LinearLayout>
+</ScrollView>
