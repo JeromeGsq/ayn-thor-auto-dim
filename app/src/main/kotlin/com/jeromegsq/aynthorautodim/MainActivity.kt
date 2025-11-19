@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         
         // Load Duration
-        val savedDuration = prefs.getLong("inactivity_delay_ms", 10000L)
+        val savedDuration = prefs.getLong("inactivity_delay_ms", 3000L)
         delayInput.setText((savedDuration / 1000).toString())
         
         // Load Opacity

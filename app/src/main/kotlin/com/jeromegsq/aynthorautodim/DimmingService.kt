@@ -23,7 +23,7 @@ class DimmingService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private val dimRunnable = Runnable { showBlackScreen() }
     
-    private var inactivityDelayMs = 10000L
+    private var inactivityDelayMs = 3000L
     private var overlayOpacity = 1f
 
     override fun onServiceConnected() {
@@ -163,8 +163,9 @@ class DimmingService : AccessibilityService() {
 
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 10000L)
+        inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 3000L)
         overlayOpacity = prefs.getInt("overlay_opacity", 100) / 100f
+        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, opacity=$overlayOpacity")
     }
 
     companion object {
