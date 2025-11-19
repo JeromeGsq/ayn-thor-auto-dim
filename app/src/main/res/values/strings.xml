@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Ayn Thor Auto Dim</string>
+    <string name="service_name">Auto Dim Service</string>
+    <string name="service_desc">Automatically dims the secondary screen after inactivity.</string>
+    <string name="permission_required">Overlay permission required</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="enable_service">Enable Accessibility Service</string>
+    <string name="service_status_running">Service is Running</string>
+    <string name="service_status_stopped">Service is Stopped</string>
+</resources>
+

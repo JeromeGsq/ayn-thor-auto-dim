@@ -1,0 +1,162 @@
+package com.jeromegsq.aynthorautodim
+
+import android.accessibilityservice.AccessibilityService
+import android.content.Context
+import android.graphics.Color
+import android.graphics.PixelFormat
+import android.hardware.display.DisplayManager
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.view.Display
+import android.view.View
+import android.view.WindowManager
+import android.view.accessibility.AccessibilityEvent
+
+class DimmingService : AccessibilityService() {
+
+    private var overlayView: View? = null
+    private var targetWindowManager: WindowManager? = null
+    private var targetDisplayId: Int = Display.INVALID_DISPLAY
+    
+    private val handler = Handler(Looper.getMainLooper())
+    private val dimRunnable = Runnable { showBlackScreen() }
+    
+    private val INACTIVITY_DELAY_MS = 10000L
+
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        Log.d(TAG, "Service Connected")
+        
+        val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        displayManager.registerDisplayListener(object : DisplayManager.DisplayListener {
+            override fun onDisplayAdded(displayId: Int) {
+                checkForSecondaryDisplay(displayManager)
+            }
+
+            override fun onDisplayRemoved(displayId: Int) {
+                if (displayId == targetDisplayId) {
+                    removeOverlay()
+                    targetDisplayId = Display.INVALID_DISPLAY
+                    targetWindowManager = null
+                }
+            }
+
+            override fun onDisplayChanged(displayId: Int) {
+                 // Optional: handle changes
+            }
+        }, handler)
+
+        checkForSecondaryDisplay(displayManager)
+        resetTimer()
+    }
+
+    private fun checkForSecondaryDisplay(displayManager: DisplayManager) {
+        if (targetDisplayId != Display.INVALID_DISPLAY) return
+
+        val displays = displayManager.displays
+        for (display in displays) {
+            if (display.displayId != Display.DEFAULT_DISPLAY) {
+                // Found a secondary display
+                targetDisplayId = display.displayId
+                Log.d(TAG, "Found secondary display: $targetDisplayId")
+                
+                val displayContext = createDisplayContext(display)
+                targetWindowManager = displayContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+                
+                resetTimer()
+                return
+            }
+        }
+    }
+
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        if (event == null) return
+
+        // Ignore events from our own app to prevent feedback loop (Show -> Event -> Reset -> Hide -> Flashing)
+        if (event.packageName != null && event.packageName == packageName) {
+            return
+        }
+        
+        // Check if event is from the target display
+        if (Build.VERSION.SDK_INT >= 30) {
+            if (targetDisplayId != Display.INVALID_DISPLAY && event.displayId == targetDisplayId) {
+                 resetTimer()
+            }
+        } else {
+            // Fallback for older APIs: we can't distinguish easily, so we reset on any event
+            // or we could try to inspect window info if performance allows, but let's keep it simple.
+            resetTimer()
+        }
+    }
+
+    override fun onInterrupt() {
+        removeOverlay()
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        removeOverlay()
+    }
+
+    private fun showBlackScreen() {
+        if (overlayView != null) return 
+        if (targetWindowManager == null) return 
+
+        Log.d(TAG, "Showing black screen")
+
+        overlayView = View(this).apply {
+            setBackgroundColor(Color.BLACK)
+            alpha = 0f
+        }
+
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or 
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or 
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            PixelFormat.OPAQUE
+        )
+        
+        try {
+            targetWindowManager?.addView(overlayView, params)
+            overlayView?.animate()
+                ?.alpha(1f)
+                ?.setDuration(300)
+                ?.start()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error adding view", e)
+        }
+    }
+
+    private fun removeOverlay() {
+        if (overlayView != null && targetWindowManager != null) {
+            try {
+                overlayView?.animate()?.cancel()
+                targetWindowManager?.removeView(overlayView)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error removing view", e)
+            }
+            overlayView = null
+        }
+    }
+
+    private fun resetTimer() {
+        // If overlay is showing, hide it
+        if (overlayView != null) {
+            removeOverlay()
+        }
+        
+        handler.removeCallbacks(dimRunnable)
+        handler.postDelayed(dimRunnable, INACTIVITY_DELAY_MS)
+    }
+
+    companion object {
+        private const val TAG = "DimmingService"
+    }
+}
+
