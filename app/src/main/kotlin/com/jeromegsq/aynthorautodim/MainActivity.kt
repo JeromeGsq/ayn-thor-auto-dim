@@ -9,7 +9,6 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,8 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceButton: Button
     private lateinit var delayInput: EditText
     private lateinit var saveButton: Button
-    private lateinit var opacitySeekBar: SeekBar
-    private lateinit var opacityLabel: TextView
     private lateinit var trueBlackSwitch: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         serviceButton = findViewById(R.id.serviceButton)
         delayInput = findViewById(R.id.delayInput)
         saveButton = findViewById(R.id.saveButton)
-        opacitySeekBar = findViewById(R.id.opacitySeekBar)
-        opacityLabel = findViewById(R.id.opacityLabel)
         trueBlackSwitch = findViewById(R.id.trueBlackSwitch)
 
         loadPreferences()
@@ -44,14 +39,6 @@ class MainActivity : AppCompatActivity() {
         saveButton.setOnClickListener {
             saveSettings()
         }
-        
-        opacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                opacityLabel.text = getString(R.string.opacity_label, progress)
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
 
         permissionButton.setOnClickListener {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -72,11 +59,6 @@ class MainActivity : AppCompatActivity() {
         val savedDuration = prefs.getLong("inactivity_delay_ms", 3000L)
         delayInput.setText((savedDuration / 1000).toString())
         
-        // Load Opacity
-        val savedOpacity = prefs.getInt("overlay_opacity", 100)
-        opacitySeekBar.progress = savedOpacity
-        opacityLabel.text = getString(R.string.opacity_label, savedOpacity)
-        
         // Load True Black Mode
         trueBlackSwitch.isChecked = prefs.getBoolean("true_black_mode", false)
     }
@@ -84,14 +66,14 @@ class MainActivity : AppCompatActivity() {
     private fun saveSettings() {
         val input = delayInput.text.toString()
         val seconds = input.toLongOrNull()
-        val opacity = opacitySeekBar.progress
         val trueBlack = trueBlackSwitch.isChecked
         
         if (seconds != null && seconds > 0) {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             prefs.edit()
                 .putLong("inactivity_delay_ms", seconds * 1000)
-                .putInt("overlay_opacity", opacity)
+                // Always save 100% opacity (100 int) since slider is removed
+                .putInt("overlay_opacity", 100) 
                 .putBoolean("true_black_mode", trueBlack)
                 .apply()
             

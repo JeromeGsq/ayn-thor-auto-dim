@@ -27,7 +27,6 @@ class DimmingService : AccessibilityService() {
     private val dimRunnable = Runnable { showBlackScreen() }
     
     private var inactivityDelayMs = 3000L
-    private var overlayOpacity = 1f
     private var trueBlackMode = false
 
     private val configReceiver = object : BroadcastReceiver() {
@@ -164,14 +163,14 @@ class DimmingService : AccessibilityService() {
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             flags,
-            PixelFormat.OPAQUE
+            PixelFormat.TRANSLUCENT
         )
         
         try {
             targetWindowManager?.addView(overlayView, params)
             overlayView?.animate()
-                ?.alpha(overlayOpacity)
-                ?.setDuration(300)
+                ?.alpha(1f)
+                ?.setDuration(500)
                 ?.start()
         } catch (e: Exception) {
             Log.e(TAG, "Error adding view", e)
@@ -206,9 +205,8 @@ class DimmingService : AccessibilityService() {
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 3000L)
-        overlayOpacity = prefs.getInt("overlay_opacity", 100) / 100f
         trueBlackMode = prefs.getBoolean("true_black_mode", false)
-        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, opacity=$overlayOpacity, trueBlack=$trueBlackMode")
+        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, trueBlack=$trueBlackMode")
     }
 
     companion object {
