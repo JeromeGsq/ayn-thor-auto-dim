@@ -1,38 +1,38 @@
 # Ayn Thor Auto Dim
 
-Application Android pour éteindre (afficher un écran noir) sur l'écran secondaire après 10 secondes d'inactivité.
+Android application to dim (show a black screen) the secondary screen after 10 seconds of inactivity.
 
-## Fonctionnalités
-- Détection de l'écran secondaire (externe/bottom screen).
-- Timer de 10 secondes sans interaction tactile.
-- Affichage d'un overlay noir (transparent au tactile) pour simuler une veille.
-- Réveil automatique au toucher (le toucher est transmis à l'application en dessous).
+## Features
+- Secondary screen detection (external/bottom screen).
+- 10-second timer without touch interaction.
+- Black overlay display (touch-transparent) to simulate sleep mode.
+- Smooth 300ms fade-in animation.
+- Automatic wake-up on touch (touches are passed through to the underlying application).
 
-## Compilation
+## Build
 
-Le projet utilise Gradle. Assurez-vous d'avoir le SDK Android installé.
+The project uses Gradle. Ensure you have the Android SDK installed.
 
 ### Via Terminal
-Utilisez le wrapper Gradle inclus pour assurer la compatibilité des versions :
+Use the included Gradle wrapper to ensure version compatibility:
 
 ```bash
 chmod +x gradlew
 ./gradlew assembleDebug
 ```
 
-L'APK sera généré dans `app/build/outputs/apk/debug/app-debug.apk`.
+The APK will be generated in `app/build/outputs/apk/debug/app-debug.apk`.
 
 ### Via Android Studio
-1. Ouvrez le dossier du projet dans Android Studio.
-2. Laissez le projet se synchroniser.
-3. Exécutez `Run` ou `Build > Build Bundle(s) / APK(s) > Build APK(s)`.
+1. Open the project folder in Android Studio.
+2. Let the project sync.
+3. Run `Run` or `Build > Build Bundle(s) / APK(s) > Build APK(s)`.
 
-## Installation et Configuration
-1. Installez l'APK sur l'appareil.
-2. Lancez l'application "Ayn Thor Auto Dim".
-3. **Permissions requises** :
-   - **Overlay (Superposition)** : Cliquez sur le bouton pour accorder la permission de dessiner par-dessus les autres applications.
-   - **Service d'Accessibilité** : Cliquez sur "Enable Service" pour activer le service d'accessibilité "Auto Dim Service". Ce service est nécessaire pour détecter l'activité tactile et gérer l'overlay sur l'écran externe.
+## Installation and Setup
+1. Install the APK on the device.
+2. Launch the "Ayn Thor Auto Dim" application.
+3. **Required Permissions**:
+   - **Overlay**: Click the button to grant permission to draw over other apps.
+   - **Accessibility Service**: Click "Enable Service" to activate the "Auto Dim Service" accessibility service. This service is required to detect touch activity and manage the overlay on the external screen.
 
-Une fois configuré, l'écran du bas devrait s'assombrir après 10 secondes d'inactivité sur celui-ci.
-
+Once configured, the bottom screen should dim after 10 seconds of inactivity on it.
