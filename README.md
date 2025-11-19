@@ -1,13 +1,15 @@
 # Ayn Thor Auto Dim
 
-Android application to dim (show a black screen) the secondary screen after 10 seconds of inactivity.
+Android application to automatically dim (show a black screen) the secondary screen of the Ayn Odin 2 DS (or similar devices) after a period of inactivity.
 
 ## Features
-- Secondary screen detection (external/bottom screen).
-- 10-second timer without touch interaction.
-- Black overlay display (touch-transparent) to simulate sleep mode.
-- Smooth 300ms fade-in animation.
-- Automatic wake-up on touch (touches are passed through to the underlying application).
+- **Secondary Screen Detection**: Automatically targets the external/bottom screen.
+- **Configurable Timer**: Set your preferred inactivity delay (default: 3 seconds).
+- **True Black Mode**: Displays a 100% opaque black overlay to simulate sleep mode and save battery.
+- **Smooth Animation**: 500ms fade-in animation for a pleasant experience.
+- **Touch to Wake**: Tap the black screen once to wake it up instantly.
+- **Live Updates**: Changes to settings are applied immediately without restarting the service.
+- **Optimized UI**: Two-column layout designed for landscape orientation.
 
 ## Build
 
@@ -35,4 +37,4 @@ The APK will be generated in `app/build/outputs/apk/debug/app-debug.apk`.
    - **Overlay**: Click the button to grant permission to draw over other apps.
    - **Accessibility Service**: Click "Enable Service" to activate the "Auto Dim Service" accessibility service. This service is required to detect touch activity and manage the overlay on the external screen.
 
-Once configured, the bottom screen should dim after 10 seconds of inactivity on it.
+Once configured, the bottom screen will dim after the specified duration of inactivity (3 seconds by default). Tap the screen to wake it up.
