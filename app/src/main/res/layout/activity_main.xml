@@ -14,6 +14,37 @@
         android:textSize="18sp"
         android:layout_marginBottom="24dp"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delay_label"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp"/>
+
+        <EditText
+            android:id="@+id/delayInput"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:text="10"
+            android:textAlignment="center"/>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:layout_marginStart="8dp"/>
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/permissionButton"
         android:layout_width="wrap_content"
@@ -28,4 +59,3 @@
         android:text="@string/enable_service"/>
 
 </LinearLayout>
-

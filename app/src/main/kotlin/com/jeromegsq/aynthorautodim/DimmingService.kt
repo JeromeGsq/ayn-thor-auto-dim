@@ -23,11 +23,13 @@ class DimmingService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private val dimRunnable = Runnable { showBlackScreen() }
     
-    private val INACTIVITY_DELAY_MS = 10000L
+    private var inactivityDelayMs = 10000L
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Service Connected")
+        
+        loadPreferences()
         
         val displayManager = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         displayManager.registerDisplayListener(object : DisplayManager.DisplayListener {
@@ -151,8 +153,16 @@ class DimmingService : AccessibilityService() {
             removeOverlay()
         }
         
+        // Reload prefs to catch changes on the fly
+        loadPreferences()
+        
         handler.removeCallbacks(dimRunnable)
-        handler.postDelayed(dimRunnable, INACTIVITY_DELAY_MS)
+        handler.postDelayed(dimRunnable, inactivityDelayMs)
+    }
+
+    private fun loadPreferences() {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 10000L)
     }
 
     companion object {

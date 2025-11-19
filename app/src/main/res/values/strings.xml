@@ -7,5 +7,7 @@
     <string name="enable_service">Enable Accessibility Service</string>
     <string name="service_status_running">Service is Running</string>
     <string name="service_status_stopped">Service is Stopped</string>
+    <string name="delay_label">Duration (seconds):</string>
+    <string name="save">Save</string>
+    <string name="saved_toast">Duration saved</string>
 </resources>
-

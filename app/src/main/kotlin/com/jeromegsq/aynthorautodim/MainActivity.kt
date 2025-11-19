@@ -8,7 +8,9 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var permissionButton: Button
     private lateinit var serviceButton: Button
+    private lateinit var delayInput: EditText
+    private lateinit var saveButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +28,14 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         permissionButton = findViewById(R.id.permissionButton)
         serviceButton = findViewById(R.id.serviceButton)
+        delayInput = findViewById(R.id.delayInput)
+        saveButton = findViewById(R.id.saveButton)
+
+        loadSavedDuration()
+
+        saveButton.setOnClickListener {
+            saveDuration()
+        }
 
         permissionButton.setOnClickListener {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -34,6 +46,25 @@ class MainActivity : AppCompatActivity() {
         serviceButton.setOnClickListener {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             startActivity(intent)
+        }
+    }
+
+    private fun loadSavedDuration() {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val savedDuration = prefs.getLong("inactivity_delay_ms", 10000L)
+        delayInput.setText((savedDuration / 1000).toString())
+    }
+
+    private fun saveDuration() {
+        val input = delayInput.text.toString()
+        val seconds = input.toLongOrNull()
+        
+        if (seconds != null && seconds > 0) {
+            val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+            prefs.edit().putLong("inactivity_delay_ms", seconds * 1000).apply()
+            Toast.makeText(this, R.string.saved_toast, Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Invalid duration", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -69,4 +100,3 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 }
-
