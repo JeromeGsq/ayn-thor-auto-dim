@@ -12,7 +12,6 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +20,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceButton: Button
     private lateinit var delayInput: EditText
     private lateinit var saveButton: Button
-    private lateinit var trueBlackSwitch: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         serviceButton = findViewById(R.id.serviceButton)
         delayInput = findViewById(R.id.delayInput)
         saveButton = findViewById(R.id.saveButton)
-        trueBlackSwitch = findViewById(R.id.trueBlackSwitch)
 
         loadPreferences()
 
@@ -58,23 +55,16 @@ class MainActivity : AppCompatActivity() {
         // Load Duration
         val savedDuration = prefs.getLong("inactivity_delay_ms", 3000L)
         delayInput.setText((savedDuration / 1000).toString())
-        
-        // Load True Black Mode
-        trueBlackSwitch.isChecked = prefs.getBoolean("true_black_mode", false)
     }
 
     private fun saveSettings() {
         val input = delayInput.text.toString()
         val seconds = input.toLongOrNull()
-        val trueBlack = trueBlackSwitch.isChecked
         
         if (seconds != null && seconds > 0) {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             prefs.edit()
                 .putLong("inactivity_delay_ms", seconds * 1000)
-                // Always save 100% opacity (100 int) since slider is removed
-                .putInt("overlay_opacity", 100) 
-                .putBoolean("true_black_mode", trueBlack)
                 .apply()
             
             // Notify service to update config

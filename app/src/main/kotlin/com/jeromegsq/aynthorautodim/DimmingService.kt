@@ -27,7 +27,6 @@ class DimmingService : AccessibilityService() {
     private val dimRunnable = Runnable { showBlackScreen() }
     
     private var inactivityDelayMs = 3000L
-    private var trueBlackMode = false
 
     private val configReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -140,23 +139,18 @@ class DimmingService : AccessibilityService() {
             setBackgroundColor(Color.BLACK)
             alpha = 0f
             
-            if (trueBlackMode) {
-                // In True Black mode, we catch the touch to dismiss
-                setOnClickListener { 
-                    resetTimer()
-                }
+            // Always catch touch to dismiss (True Black logic)
+            setOnClickListener { 
+                resetTimer()
             }
         }
 
-        var flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
+        // Always using True Black mode logic:
+        // FLAG_NOT_FOCUSABLE allows interaction with system UI if needed (like status bar),
+        // but we are NOT setting FLAG_NOT_TOUCHABLE, so we intercept touches.
+        val flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or 
                     WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-
-        if (!trueBlackMode) {
-             // If NOT true black mode, allow touches to pass through
-             // This will cause the system to limit opacity to ~0.8
-             flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-        }
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
@@ -205,8 +199,7 @@ class DimmingService : AccessibilityService() {
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 3000L)
-        trueBlackMode = prefs.getBoolean("true_black_mode", false)
-        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, trueBlack=$trueBlackMode")
+        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms")
     }
 
     companion object {
