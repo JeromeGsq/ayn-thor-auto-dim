@@ -25,6 +25,7 @@ class DimmingService : AccessibilityService() {
     
     private var inactivityDelayMs = 3000L
     private var overlayOpacity = 1f
+    private var trueBlackMode = false
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -112,16 +113,30 @@ class DimmingService : AccessibilityService() {
         overlayView = View(this).apply {
             setBackgroundColor(Color.BLACK)
             alpha = 0f
+            
+            if (trueBlackMode) {
+                // In True Black mode, we catch the touch to dismiss
+                setOnClickListener { 
+                    resetTimer()
+                }
+            }
+        }
+
+        var flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or 
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+
+        if (!trueBlackMode) {
+             // If NOT true black mode, allow touches to pass through
+             // This will cause the system to limit opacity to ~0.8
+             flags = flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         }
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or 
-            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or 
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or 
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            flags,
             PixelFormat.OPAQUE
         )
         
@@ -165,7 +180,8 @@ class DimmingService : AccessibilityService() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 3000L)
         overlayOpacity = prefs.getInt("overlay_opacity", 100) / 100f
-        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, opacity=$overlayOpacity")
+        trueBlackMode = prefs.getBoolean("true_black_mode", false)
+        Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms, opacity=$overlayOpacity, trueBlack=$trueBlackMode")
     }
 
     companion object {

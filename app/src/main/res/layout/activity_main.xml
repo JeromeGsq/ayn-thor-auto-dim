@@ -52,7 +52,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:paddingHorizontal="32dp">
 
         <TextView
@@ -69,6 +69,32 @@
             android:layout_height="wrap_content"
             android:max="100"
             android:progress="100"/>
+
+    </LinearLayout>
+
+    <!-- True Black Mode Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
+        android:paddingHorizontal="32dp">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/trueBlackSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/true_black_label"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/true_black_desc"
+            android:textSize="12sp"
+            android:alpha="0.7"
+            android:layout_marginTop="4dp"/>
 
     </LinearLayout>
 

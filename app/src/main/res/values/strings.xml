@@ -11,4 +11,6 @@
     <string name="save">Save</string>
     <string name="saved_toast">Settings saved</string>
     <string name="opacity_label">Opacity: %d%%</string>
+    <string name="true_black_label">True Black Mode</string>
+    <string name="true_black_desc">Allows 100% opacity but requires a tap to wake up (blocks the first touch).</string>
 </resources>

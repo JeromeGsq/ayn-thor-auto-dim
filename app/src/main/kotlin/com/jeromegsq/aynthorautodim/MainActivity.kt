@@ -13,6 +13,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var saveButton: Button
     private lateinit var opacitySeekBar: SeekBar
     private lateinit var opacityLabel: TextView
+    private lateinit var trueBlackSwitch: SwitchMaterial
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.saveButton)
         opacitySeekBar = findViewById(R.id.opacitySeekBar)
         opacityLabel = findViewById(R.id.opacityLabel)
+        trueBlackSwitch = findViewById(R.id.trueBlackSwitch)
 
         loadPreferences()
 
@@ -73,18 +76,23 @@ class MainActivity : AppCompatActivity() {
         val savedOpacity = prefs.getInt("overlay_opacity", 100)
         opacitySeekBar.progress = savedOpacity
         opacityLabel.text = getString(R.string.opacity_label, savedOpacity)
+        
+        // Load True Black Mode
+        trueBlackSwitch.isChecked = prefs.getBoolean("true_black_mode", false)
     }
 
     private fun saveSettings() {
         val input = delayInput.text.toString()
         val seconds = input.toLongOrNull()
         val opacity = opacitySeekBar.progress
+        val trueBlack = trueBlackSwitch.isChecked
         
         if (seconds != null && seconds > 0) {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             prefs.edit()
                 .putLong("inactivity_delay_ms", seconds * 1000)
                 .putInt("overlay_opacity", opacity)
+                .putBoolean("true_black_mode", trueBlack)
                 .apply()
             Toast.makeText(this, R.string.saved_toast, Toast.LENGTH_SHORT).show()
         } else {
