@@ -24,6 +24,7 @@ class DimmingService : AccessibilityService() {
     private val dimRunnable = Runnable { showBlackScreen() }
     
     private var inactivityDelayMs = 10000L
+    private var overlayOpacity = 1f
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -127,7 +128,7 @@ class DimmingService : AccessibilityService() {
         try {
             targetWindowManager?.addView(overlayView, params)
             overlayView?.animate()
-                ?.alpha(1f)
+                ?.alpha(overlayOpacity)
                 ?.setDuration(300)
                 ?.start()
         } catch (e: Exception) {
@@ -163,6 +164,7 @@ class DimmingService : AccessibilityService() {
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 10000L)
+        overlayOpacity = prefs.getInt("overlay_opacity", 100) / 100f
     }
 
     companion object {

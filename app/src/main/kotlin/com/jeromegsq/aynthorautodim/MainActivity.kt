@@ -9,6 +9,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var serviceButton: Button
     private lateinit var delayInput: EditText
     private lateinit var saveButton: Button
+    private lateinit var opacitySeekBar: SeekBar
+    private lateinit var opacityLabel: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,12 +33,22 @@ class MainActivity : AppCompatActivity() {
         serviceButton = findViewById(R.id.serviceButton)
         delayInput = findViewById(R.id.delayInput)
         saveButton = findViewById(R.id.saveButton)
+        opacitySeekBar = findViewById(R.id.opacitySeekBar)
+        opacityLabel = findViewById(R.id.opacityLabel)
 
-        loadSavedDuration()
+        loadPreferences()
 
         saveButton.setOnClickListener {
-            saveDuration()
+            saveSettings()
         }
+        
+        opacitySeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                opacityLabel.text = getString(R.string.opacity_label, progress)
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
 
         permissionButton.setOnClickListener {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -49,19 +62,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadSavedDuration() {
+    private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        
+        // Load Duration
         val savedDuration = prefs.getLong("inactivity_delay_ms", 10000L)
         delayInput.setText((savedDuration / 1000).toString())
+        
+        // Load Opacity
+        val savedOpacity = prefs.getInt("overlay_opacity", 100)
+        opacitySeekBar.progress = savedOpacity
+        opacityLabel.text = getString(R.string.opacity_label, savedOpacity)
     }
 
-    private fun saveDuration() {
+    private fun saveSettings() {
         val input = delayInput.text.toString()
         val seconds = input.toLongOrNull()
+        val opacity = opacitySeekBar.progress
         
         if (seconds != null && seconds > 0) {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            prefs.edit().putLong("inactivity_delay_ms", seconds * 1000).apply()
+            prefs.edit()
+                .putLong("inactivity_delay_ms", seconds * 1000)
+                .putInt("overlay_opacity", opacity)
+                .apply()
             Toast.makeText(this, R.string.saved_toast, Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Invalid duration", Toast.LENGTH_SHORT).show()
