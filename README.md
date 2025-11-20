@@ -1,6 +1,10 @@
 # Ayn Thor Auto Dim
 
-Android application to automatically dim (show a black screen) the secondary screen of the Ayn Odin 2 DS (or similar devices) after a period of inactivity.
+Android application to automatically dim (show a black screen) the secondary screen of the Ayn Thor (or similar devices) after a period of inactivity.
+
+# BUG
+There is a bug, when you are scrolling, the timer isn't reset, and the screen goes black. I will try to find a fix. 
+Thanks.
 
 ## Features
 
@@ -10,7 +14,6 @@ Android application to automatically dim (show a black screen) the secondary scr
 - **Smooth Animation**: 500ms fade-in animation for a pleasant experience.
 - **Touch to Wake**: Tap the black screen once to wake it up instantly.
 - **Live Updates**: Changes to settings are applied immediately without restarting the service.
-- **Optimized UI**: Two-column layout designed for landscape orientation.
 
 ## Build
 
