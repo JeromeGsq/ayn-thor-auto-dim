@@ -1,6 +1,34 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+}
+
+fun getGitVersionName(): String {
+    return try {
+        val stdout = ByteArrayOutputStream()
+        project.exec {
+            commandLine("git", "describe", "--tags")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().replace("^v".toRegex(), "")
+    } catch (e: Exception) {
+        "1.0.0"
+    }
+}
+
+fun getGitVersionCode(): Int {
+    return try {
+        val stdout = ByteArrayOutputStream()
+        project.exec {
+            commandLine("git", "rev-list", "--count", "HEAD")
+            standardOutput = stdout
+        }
+        stdout.toString().trim().toInt()
+    } catch (e: Exception) {
+        1
+    }
 }
 
 android {
@@ -11,8 +39,8 @@ android {
         applicationId = "com.jeromegsq.aynthorautodim"
         minSdk = 29
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = getGitVersionCode()
+        versionName = getGitVersionName()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
