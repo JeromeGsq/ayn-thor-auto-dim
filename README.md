@@ -2,6 +2,8 @@
 
 Android application to automatically dim (show a black screen) the secondary screen of the Ayn Thor (or similar devices) after a period of inactivity.
 
+Example: https://www.reddit.com/r/AynThor/comments/1p1lvgl/auto_dim_the_bottom_screen_of_the_ayn_thor/
+
 # BUG
 There is a bug, when you are scrolling, the timer isn't reset, and the screen goes black. I will try to find a fix. 
 Thanks.
