@@ -73,8 +73,8 @@ class MainActivity : AppCompatActivity() {
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
         
-        // Load Duration
-        val savedDuration = prefs.getLong("inactivity_delay_ms", 3000L)
+        // Load Duration (default 30 seconds)
+        val savedDuration = prefs.getLong("inactivity_delay_ms", 30000L)
         delayInput.setText((savedDuration / 1000).toString())
     }
 
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         val input = delayInput.text.toString()
         val seconds = input.toLongOrNull()
         
-        if (seconds != null && seconds > 0) {
+        if (seconds != null && seconds >= 1) {
             val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             prefs.edit()
                 .putLong("inactivity_delay_ms", seconds * 1000)
@@ -95,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             
             Toast.makeText(this, R.string.saved_toast, Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "Invalid duration", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Duration must be at least 1 second", Toast.LENGTH_SHORT).show()
         }
     }
 

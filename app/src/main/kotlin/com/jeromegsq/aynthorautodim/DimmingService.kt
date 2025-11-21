@@ -263,7 +263,11 @@ class DimmingService : AccessibilityService() {
 
     private fun loadPreferences() {
         val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 3000L)
+        inactivityDelayMs = prefs.getLong("inactivity_delay_ms", 30000L)
+        // Enforce minimum 1 second
+        if (inactivityDelayMs < 1000L) {
+            inactivityDelayMs = 1000L
+        }
         Log.d(TAG, "Loaded prefs: delay=${inactivityDelayMs}ms")
     }
 
